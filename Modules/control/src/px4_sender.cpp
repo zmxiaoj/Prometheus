@@ -212,6 +212,7 @@ int main(int argc, char **argv)
         // 当前时间
         cur_time = prometheus_control_utils::get_time_in_sec(begin_time);
         dt = cur_time  - last_time;
+        // clamp to [0.02 0.1]
         dt = constrain_function2(dt, 0.02, 0.1);
         last_time = cur_time;
 
@@ -220,13 +221,17 @@ int main(int argc, char **argv)
 
 
         // Check for geo fence: If drone is out of the geo fence, it will land now.
+        // 检查飞行是否在围栏内，mocap是否丢失
         if(Command_Now.Mode !=prometheus_msgs::ControlCommand::Idle )
         {
             int safety_flag = check_failsafe();
+            // 超出地理围栏，执行降落
             if(safety_flag == 1)
             {
                 Command_Now.Mode = prometheus_msgs::ControlCommand::Land;
-            }else if(safety_flag == 2)
+            }
+            // mocap定位丢失
+            else if(safety_flag == 2)
             {
                 // 快速降落
                 Land_speed = 0.8;
@@ -442,6 +447,7 @@ int main(int argc, char **argv)
                     {
                         float d_pos_body[2] = {Command_Now.Reference_State.position_ref[0], Command_Now.Reference_State.position_ref[1]};         //the desired xy position in Body Frame
                         float d_pos_enu[2];                       //the desired xy position in enu Frame (The origin point is the drone)
+                        // 机体系到ENU系
                         prometheus_control_utils::rotation_yaw(_DroneState.attitude[2], d_pos_body, d_pos_enu);
 
                         Command_Now.Reference_State.position_ref[0] = _DroneState.position[0] + d_pos_enu[0];
