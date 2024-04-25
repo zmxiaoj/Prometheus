@@ -268,16 +268,25 @@ void mainloop1()
                 break;
 
             case prometheus_msgs::ControlCommand::User_Mode1:
+                // Command_to_pub.header.stamp = ros::Time::now();
+                // Command_to_pub.Mode = prometheus_msgs::ControlCommand::User_Mode1;
+                // Command_to_pub.Command_ID = Command_to_pub.Command_ID + 1;
+                // Command_to_pub.source = NODE_NAME;
+                // Command_to_pub.Reference_State.latitude = 47.3977431;
+                // Command_to_pub.Reference_State.longitude = 8.5456771;
+                // Command_to_pub.Reference_State.altitude = 510;
+                // Command_to_pub.Reference_State.yaw_ref = 0/180.0*M_PI;
+
+                // move_pub.publish(Command_to_pub);
+
                 Command_to_pub.header.stamp = ros::Time::now();
-                Command_to_pub.Mode = prometheus_msgs::ControlCommand::User_Mode1;
+                Command_to_pub.Mode = prometheus_msgs::ControlCommand::Idle;
                 Command_to_pub.Command_ID = Command_to_pub.Command_ID + 1;
                 Command_to_pub.source = NODE_NAME;
-                Command_to_pub.Reference_State.latitude = 47.3977431;
-                Command_to_pub.Reference_State.longitude = 8.5456771;
-                Command_to_pub.Reference_State.altitude = 510;
-                Command_to_pub.Reference_State.yaw_ref = 0/180.0*M_PI;
-
+                Command_to_pub.Reference_State.yaw_ref = 999;
                 move_pub.publish(Command_to_pub);
+                Command_to_pub.Reference_State.yaw_ref = 0.0;
+
                 break;
             
             case prometheus_msgs::ControlCommand::User_Mode2:

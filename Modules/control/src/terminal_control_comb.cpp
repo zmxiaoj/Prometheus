@@ -128,6 +128,7 @@ int main(int argc, char **argv)
   ros::Subscriber drone_state_sub = nh.subscribe<prometheus_msgs::DroneState>("/prometheus/drone_state", 10, drone_state_cb);
   // // 【订阅】裁判系统指令
   // ros::Subscriber mission_state_sub = nh.subscribe<iusc_referee::MissionState>("/MissionState", 10, mission_state_cb);
+  
   // 【订阅】规划所得的速度指令和偏航指令
   ros::Subscriber planning_command = nh.subscribe<geometry_msgs::Twist>("/planning/control_command", 10, planningcommand_cb);
   // 【订阅】规划状态标志

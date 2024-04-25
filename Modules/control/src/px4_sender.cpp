@@ -219,9 +219,8 @@ int main(int argc, char **argv)
         // 执行回调函数
         ros::spinOnce();
 
-
-        // Check for geo fence: If drone is out of the geo fence, it will land now.
         // 检查飞行是否在围栏内，mocap是否丢失
+        // Check for geo fence: If drone is out of the geo fence, it will land now.
         if(Command_Now.Mode !=prometheus_msgs::ControlCommand::Idle )
         {
             int safety_flag = check_failsafe();

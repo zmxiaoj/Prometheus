@@ -15,7 +15,7 @@
 
 	<!-- vrpn -->
 	<include file="$(find vrpn_client_ros)/launch/sample.launch">
-		<arg name="server" value="192.168.1.2"/>
+		<arg name="server" value="192.168.1.112"/>
 	</include>
 
 	<!-- run the px4_pos_estimator.cpp -->
@@ -23,7 +23,7 @@
 		<!-- 0 for vicon， 1 for 激光SLAM, 2 for gazebo ground truth(仿真用) -->
 		<param name="input_source" value="0" />
 		<!-- 如果使用动作捕捉系统，则指定刚体名称，用于订阅vrpn节点发布的话题 -->
-		<param name="object_name" value="UAV"/>
+		<param name="object_name" value="A1_12"/>
 		<param name="rate_hz" value="20.0"/>
 	</node>
 	
@@ -31,5 +31,9 @@
 	<node pkg="prometheus_control" type="px4_sender" name="px4_sender" output="screen">
 		<rosparam command="load" file="$(find prometheus_experiment)/config/prometheus_control_config/px4_sender.yaml"/>
 	</node>
+
+	<!-- run the px4_pos_controller.cpp -->
+	<!-- <node pkg="prometheus_control" type="px4_pos_controller" name="px4_pos_controller" output="screen">
+	</node> -->
 </launch>
 
