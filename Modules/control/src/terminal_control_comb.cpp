@@ -191,7 +191,7 @@ void mainloop(ros::NodeHandle& nh)
   // 航点跟踪和起飞控制的执行标志
   int pos_control_flag = 0;
   int take_off_flag = 0;
-  int initial_cmd = 0;
+  int initial_cmd = 1;
   // 按键
   char key_now;
   char key_last;
@@ -263,7 +263,7 @@ void mainloop(ros::NodeHandle& nh)
       time_begin_takeoff = ros::Time::now();
       time_sec_takeoff = 0;
       // 进入一级起飞阶段
-      take_off_flag = 0;
+      take_off_flag = 1;
       initial_height = drone_pos[2];
       break;
 
@@ -307,7 +307,7 @@ void mainloop(ros::NodeHandle& nh)
       time_begin_takeoff = ros::Time::now();
       time_sec_takeoff = 0;
       // 进入一级起飞阶段
-      take_off_flag = 0;
+      take_off_flag = 1;
       initial_height = drone_pos[2];
       // 起飞指令关闭
       initial_cmd = 0;
