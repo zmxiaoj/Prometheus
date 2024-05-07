@@ -259,6 +259,17 @@ int main(int argc, char **argv)
                     pub_message(message_pub, prometheus_msgs::Message::NORMAL, NODE_NAME, "The Drone is in OFFBOARD Mode already...");
                 }
 
+                Eigen::Vector3d Position_current(_DroneState.position[0], _DroneState.position[1], _DroneState.position[2]);
+                Eigen::Vector3d Position_reference(Position_current[0], Position_current[1], Position_current[2]);
+                state_sp = Eigen::Vector3d(Position_reference[0], Position_reference[1], Position_reference[2]);
+                yaw_sp = _DroneState.attitude[2]; //rad
+                for (int i = 0; i < 10; i++)
+                {
+                    _command_to_mavros.send_pos_setpoint(state_sp, yaw_sp);
+                    ros::Duration(0.1).sleep();
+                    std::cout << "Setting to OFFBOARD Mode..." << std::endl;
+                }
+                
                 if(!_DroneState.armed)
                 {
                     _command_to_mavros.arm_cmd.request.value = true;
@@ -609,6 +620,7 @@ int main(int argc, char **argv)
                 yaw_sp = _DroneState.attitude[2]; //rad
                 
                 _command_to_mavros.send_pos_setpoint(state_sp, yaw_sp);
+                std::cout << "Flying 0.5m in X" << std::endl;
             }
             break;
 
@@ -640,6 +652,7 @@ int main(int argc, char **argv)
                 yaw_sp = _DroneState.attitude[2]; //rad
                 
                 _command_to_mavros.send_pos_setpoint(state_sp, yaw_sp);
+                std::cout << "Flying 0.5m in Y" << std::endl;
             }
             break;
         }
