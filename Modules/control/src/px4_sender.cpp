@@ -159,7 +159,7 @@ int main(int argc, char **argv)
     ros::Timer timer = nh.createTimer(ros::Duration(10.0), timerCallback);
 
     // 参数读取
-    nh.param<float>("Takeoff_height", Takeoff_height, 1.0);
+    nh.param<float>("Takeoff_height", Takeoff_height, 0.5);
     nh.param<float>("Disarm_height", Disarm_height, 0.15);
     nh.param<float>("Land_speed", Land_speed, 0.2);
     nh.param<int>("Land_mode",Land_mode,0);
@@ -259,6 +259,18 @@ int main(int argc, char **argv)
                     pub_message(message_pub, prometheus_msgs::Message::NORMAL, NODE_NAME, "The Drone is in OFFBOARD Mode already...");
                 }
 
+                // 切换到offboard就会起飞
+                // Eigen::Vector3d Position_current(_DroneState.position[0], _DroneState.position[1], _DroneState.position[2]);
+                // Eigen::Vector3d Position_reference(Position_current[0], Position_current[1], Position_current[2]);
+                // state_sp = Eigen::Vector3d(Position_reference[0], Position_reference[1], Position_reference[2]);
+                // yaw_sp = _DroneState.attitude[2]; //rad
+                // for (int i = 0; i < 10; i++)
+                // {
+                //     _command_to_mavros.send_pos_setpoint(state_sp, yaw_sp);
+                //     ros::Duration(0.1).sleep();
+                //     std::cout << "Setting to OFFBOARD Mode..." << std::endl;
+                // }
+                
                 if(!_DroneState.armed)
                 {
                     _command_to_mavros.arm_cmd.request.value = true;
@@ -583,15 +595,65 @@ int main(int argc, char **argv)
 
         // 【User_Mode1】 暂空。可进行自定义
         case prometheus_msgs::ControlCommand::User_Mode1:
-            global_pos_sp[0] = Command_Now.Reference_State.latitude;
-            global_pos_sp[1] = Command_Now.Reference_State.longitude;
-            global_pos_sp[2] = Command_Now.Reference_State.altitude;
-            yaw_sp = Command_Now.Reference_State.yaw_ref;
-            _command_to_mavros.send_global_setpoint(global_pos_sp, yaw_sp);
+            if( Command_Now.Command_ID  >  Command_Last.Command_ID)
+            {
+                pub_message(message_pub, prometheus_msgs::Message::NORMAL, NODE_NAME, "Flying to X!");
+                // 当前位置
+                Eigen::Vector3d Position_current;
+                Position_current[0] = _DroneState.position[0];
+                Position_current[1] = _DroneState.position[1];
+                Position_current[2] = _DroneState.position[2];
+
+                // Reference Position
+                Eigen::Vector3d Position_refecence;
+                Position_refecence[0] = Position_current[0] + 0.5;
+                Position_refecence[1] = Position_current[1];
+                Position_refecence[2] = Position_current[2];
+
+                Command_Now.Reference_State.Move_mode       = prometheus_msgs::PositionReference::XYZ_POS;
+                Command_Now.Reference_State.Move_frame      = prometheus_msgs::PositionReference::ENU_FRAME;
+                Command_Now.Reference_State.position_ref[0] = Position_refecence[0];
+                Command_Now.Reference_State.position_ref[1] = Position_refecence[1];
+                Command_Now.Reference_State.position_ref[2] = Position_refecence[2];
+                Command_Now.Reference_State.yaw_ref         = _DroneState.attitude[2];
+                
+                state_sp = Eigen::Vector3d(Position_refecence[0], Position_refecence[1], Position_refecence[2]);
+                yaw_sp = _DroneState.attitude[2]; //rad
+                
+                std::cout << "Flying 0.5m in X" << std::endl;
+            }
+            _command_to_mavros.send_pos_setpoint(state_sp, yaw_sp);
             break;
 
         // 【User_Mode2】 暂空。可进行自定义
         case prometheus_msgs::ControlCommand::User_Mode2:
+            if( Command_Now.Command_ID  >  Command_Last.Command_ID)
+            {
+                pub_message(message_pub, prometheus_msgs::Message::NORMAL, NODE_NAME, "Flying to Y!");
+                // 当前位置
+                Eigen::Vector3d Position_current;
+                Position_current[0] = _DroneState.position[0];
+                Position_current[1] = _DroneState.position[1];
+                Position_current[2] = _DroneState.position[2];
+
+                // Reference Position
+                Eigen::Vector3d Position_refecence;
+                Position_refecence[0] = Position_current[0];
+                Position_refecence[1] = Position_current[1] + 0.5;
+                Position_refecence[2] = Position_current[2];
+
+                Command_Now.Reference_State.Move_mode       = prometheus_msgs::PositionReference::XYZ_POS;
+                Command_Now.Reference_State.Move_frame      = prometheus_msgs::PositionReference::ENU_FRAME;
+                Command_Now.Reference_State.position_ref[0] = Position_refecence[0];
+                Command_Now.Reference_State.position_ref[1] = Position_refecence[1];
+                Command_Now.Reference_State.position_ref[2] = Position_refecence[2];
+                Command_Now.Reference_State.yaw_ref         = _DroneState.attitude[2];
+                
+                state_sp = Eigen::Vector3d(Position_refecence[0], Position_refecence[1], Position_refecence[2]);
+                yaw_sp = _DroneState.attitude[2]; //rad
+                std::cout << "Flying 0.5m in Y" << std::endl;
+            }
+            _command_to_mavros.send_pos_setpoint(state_sp, yaw_sp);
             
             break;
         }

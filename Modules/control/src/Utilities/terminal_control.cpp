@@ -66,6 +66,11 @@ int main(int argc, char **argv)
     //　【发布】　参考轨迹
     ref_trajectory_pub = nh.advertise<nav_msgs::Path>("/prometheus/reference_trajectory", 10);
     
+    // 【请求服务】  解锁
+    ros::ServiceClient arming_client = nh.serviceClient<mavros_msgs::CommandBool>("/mavros/cmd/arming");
+    mavros_msgs::CommandBool arm_cmd;
+    arm_cmd.request.value = true;
+
     //用于控制器测试的类，功能例如：生成圆形轨迹，８字轨迹等
     Controller_Test Controller_Test;    // 打印参数
     Controller_Test.printf_param();
@@ -131,7 +136,7 @@ void mainloop1()
     {
         // Waiting for input
         cout << ">>>>>>>>>>>>>>>> Welcome to use Prometheus Terminal Control <<<<<<<<<<<<<<<<"<< endl;
-        cout << "Please choose the Command.Mode: 0 for Idle, 1 for Takeoff, 2 for Hold, 3 for Land, 4 for Move, 5 for Disarm, 6 for User_Mode1, 7 for User_Mode2"<<endl;
+        cout << "Please choose the Command.Mode: 0 for Idle, 1 for Takeoff, 2 for Hold, 3 for Land, 4 for Move, 5 for Disarm, 6 for Pos_X, 7 for Pos_Y"<<endl;
         cout << "Input 999 to switch to offboard mode and arm the drone (ONLY for simulation, please use RC in experiment!!!)"<<endl;
         cin  >> Control_Mode;
 
@@ -268,24 +273,11 @@ void mainloop1()
                 break;
 
             case prometheus_msgs::ControlCommand::User_Mode1:
-                // Command_to_pub.header.stamp = ros::Time::now();
-                // Command_to_pub.Mode = prometheus_msgs::ControlCommand::User_Mode1;
-                // Command_to_pub.Command_ID = Command_to_pub.Command_ID + 1;
-                // Command_to_pub.source = NODE_NAME;
-                // Command_to_pub.Reference_State.latitude = 47.3977431;
-                // Command_to_pub.Reference_State.longitude = 8.5456771;
-                // Command_to_pub.Reference_State.altitude = 510;
-                // Command_to_pub.Reference_State.yaw_ref = 0/180.0*M_PI;
-
-                // move_pub.publish(Command_to_pub);
-
                 Command_to_pub.header.stamp = ros::Time::now();
-                Command_to_pub.Mode = prometheus_msgs::ControlCommand::Idle;
+                Command_to_pub.Mode = prometheus_msgs::ControlCommand::User_Mode1;
                 Command_to_pub.Command_ID = Command_to_pub.Command_ID + 1;
                 Command_to_pub.source = NODE_NAME;
-                Command_to_pub.Reference_State.yaw_ref = 999;
                 move_pub.publish(Command_to_pub);
-                Command_to_pub.Reference_State.yaw_ref = 0.0;
 
                 break;
             
